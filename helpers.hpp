@@ -69,6 +69,8 @@ class Order
         void show_items(void);
         void show_menu(void);
         void change_quantity(unsigned int item_id);
+        void produce_bill(void);
+        void calculate_bill(void);
 
         friend unsigned int get_cart_size(Order &order);
 };

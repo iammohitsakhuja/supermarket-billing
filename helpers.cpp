@@ -109,6 +109,19 @@ void Order::show_menu(void)
 
 
 /**
+ * Member function to calculate the bill.
+ */
+void Order::calculate_bill(void)
+{
+    this->bill = 0;
+    for (int i = 0, size = items.size(); i < size; i++)
+    {
+        this->bill += items[i].net_cost;
+    }
+}
+
+
+/**
  * Member function to get the new quantity for a particular item,
  * index of which is received as an argument.
  */
@@ -130,7 +143,31 @@ void Order::change_quantity(unsigned int item_id)
     this->items[item_id].quantity = qty;
     this->items[item_id].net_cost = this->items[id].calculate_net_cost();
     cout << "\n" << this->items[item_id].quantity << " " << this->items[item_id].name << " in cart.\n";
+    this->calculate_bill();
     system("sleep 1");
+}
+
+
+/**
+ * Member function to produce the bill for the current order.
+ */
+void Order::produce_bill(void)
+{
+    cout << "Here's the bill for your order:\n";
+    cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
+         << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
+    for (int i = 0, size = items.size(); i < size; i++)
+    {
+        cout << " *   ";
+        cout << right << setfill('0') << setw(2) << items[i].number << "\t"
+             << left << setfill(' ') << setw(15) << items[i].name << "\t"
+             << right << setfill(' ') << setw(4) << items[i].cost << "\t"
+             << setfill('0') << setw(2) << items[i].quantity << "\t"
+             << right << setfill(' ') << setw(4) << items[i].net_cost << "\t*\n";
+    }
+
+    cout << "Total:\t\t\t" << this->bill << endl;
+    cout << GREEN << "Thank you for shopping with us!" << RESET << endl;
 }
 
 
