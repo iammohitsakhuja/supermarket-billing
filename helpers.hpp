@@ -13,8 +13,11 @@
 #include <iomanip>
 #include <vector>
 #include <iterator>
+#include <cstdlib>
 
 using namespace std;
+
+class Order;
 
 class Item
 {
@@ -45,6 +48,10 @@ class Item
         // overloaded assignment operator
         void operator = (Item &item);
 
+        // common friend function for both classes,
+        // needed here to access the `quantity` of an item
+        friend unsigned int get_cart_size(Order &order);
+
         // Destructor
         ~Item(void)
         {
@@ -72,6 +79,7 @@ class Order
         void produce_bill(void);
         void calculate_bill(void);
 
+        // common friend function for both classes
         friend unsigned int get_cart_size(Order &order);
 };
 
@@ -98,5 +106,6 @@ class Order
 // };
 
 void clear_screen(void);
+void housekeeping(Item *items);
 
 #endif

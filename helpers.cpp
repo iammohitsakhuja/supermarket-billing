@@ -4,8 +4,6 @@
  *
  * Author: Mohit Sakhuja
  */
-#include <iostream>
-
 #include "helpers.hpp"
 
 // Some colors and sounds.
@@ -177,6 +175,12 @@ void Order::produce_bill(void)
  */
 unsigned int get_cart_size(Order &order)
 {
+    order.items_in_cart = 0;
+    for (int i = 0; i < order.items.size(); i++)
+    {
+        order.items_in_cart += order.items[i].quantity;
+    }
+
     return order.items_in_cart;
 }
 
@@ -249,4 +253,12 @@ inline float Item::calculate_net_cost(void)
 void clear_screen(void)
 {
     std::cout << "\033[2J\n" << "\033[0;0H";
+}
+
+/**
+ * Housekeeping function
+ */
+void housekeeping(Item *items)
+{
+    delete[] items;
 }
