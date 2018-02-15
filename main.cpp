@@ -36,72 +36,49 @@ int main(void)
 
     int choice;
 
+    greet();
+    order.show_menu();
+    cin >> choice;
+
     while (true)
     {
+        switch (choice)
+        {
+            case 0 ... 7:
+                // Change the quantity for an item/Add an item
+                order.change_quantity(choice);
+                break;
+
+            case 10:
+                // View cart
+                order.view_cart();
+                break;
+
+            case 20:
+                // Produce bill
+                char option;
+                cout << "Are you sure you don't want to buy anything else? (y/n) ";
+                cin >> option;
+
+                if (option == 'y')
+                {
+                    order.produce_bill();
+                    return 0;
+                }
+                break;
+
+            case 500:
+                // Quit
+                return 0;
+
+            default:
+                // Invalid option
+                invalid_option();
+                break;
+        }
+
         order.show_menu();
         cin >> choice;
-
-        if (get_cart_size(order) > 0)
-        {
-            switch (choice)
-            {
-                case 0 ... 7:
-                    order.change_quantity(choice);
-                    break;
-
-                case -1:
-                    // TODO: Produce bill
-                    order.produce_bill();
-                    exit(EXIT_SUCCESS);
-                    break;
-
-                case -2:
-                    // TODO: Abandon and Quit
-                    // Implement ask and quit function here
-                    cout << "Are you sure you want to quit? (y/n)\n";
-                    cin >> choice;
-                    if (choice == 'y')
-                    {
-                        cout << "Okay, quitting...";
-                        exit(EXIT_FAILURE);
-                    }
-                    break;
-
-                default:
-                    // TODO: Show error
-                    cout << "You've entered a wrong choice.\n"
-                         << "Please enter a right one!";
-                    break;
-            }
-        }
-        else
-        {
-            // TODO: Implement logic here
-            switch (choice)
-            {
-                case 0 ... 7:
-                    order.change_quantity(choice);
-                    break;
-
-                case -2:
-                    // TODO: Abandon and Quit
-                    // Implement ask and quit function here
-                    cout << "Are you sure you want to quit? (y/n)\n";
-                    cin >> choice;
-                    if (choice == 'y')
-                    {
-                        cout << "Okay, quitting...";
-                        exit(EXIT_FAILURE);
-                    }
-                    break;
-
-                default:
-                    // TODO: Show error
-                    cout << "You've entered a wrong choice.\n"
-                         << "Please enter a right one!";
-                    break;
-            }
-        }
     }
 
     // success
