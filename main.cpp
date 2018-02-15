@@ -6,9 +6,6 @@
  * Author: Mohit Sakhuja
  */
 
-#include <iostream>
-#include <iomanip>
-
 #include "helpers.hpp"
 
 using namespace std;
@@ -34,41 +31,78 @@ int main(void)
         order.add_item(hc_items[i]);
     }
 
+    // housekeeping for items
+    housekeeping(hc_items);
+
     int choice;
 
     while (true)
     {
         order.show_menu();
         cin >> choice;
+
         if (get_cart_size(order) > 0)
         {
-            if (choice >= 0 && choice <= 7)
+            switch (choice)
             {
-                order.change_quantity(choice);
-                break;
-            }
-            else if (choice == -1)
-            {
-                // TODO: produce bill
-                break;
-            }
-            else
-            {
-                // TODO: Quit
-                break;
+                case 0 ... 7:
+                    order.change_quantity(choice);
+                    break;
+
+                case -1:
+                    // TODO: Produce bill
+                    order.produce_bill();
+                    exit(EXIT_SUCCESS);
+                    break;
+
+                case -2:
+                    // TODO: Abandon and Quit
+                    // Implement ask and quit function here
+                    cout << "Are you sure you want to quit? (y/n)\n";
+                    cin >> choice;
+                    if (choice == 'y')
+                    {
+                        cout << "Okay, quitting...";
+                        exit(EXIT_FAILURE);
+                    }
+                    break;
+
+                default:
+                    // TODO: Show error
+                    cout << "You've entered a wrong choice.\n"
+                         << "Please enter a right one!";
+                    break;
             }
         }
         else
         {
             // TODO: Implement logic here
+            switch (choice)
+            {
+                case 0 ... 7:
+                    order.change_quantity(choice);
+                    break;
+
+                case -2:
+                    // TODO: Abandon and Quit
+                    // Implement ask and quit function here
+                    cout << "Are you sure you want to quit? (y/n)\n";
+                    cin >> choice;
+                    if (choice == 'y')
+                    {
+                        cout << "Okay, quitting...";
+                        exit(EXIT_FAILURE);
+                    }
+                    break;
+
+                default:
+                    // TODO: Show error
+                    cout << "You've entered a wrong choice.\n"
+                         << "Please enter a right one!";
+                    break;
+            }
         }
     }
-
-
-
-
-    // housekeeping
-    delete[] hc_items;
 
     // success
     return 0;
