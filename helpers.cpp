@@ -4,6 +4,7 @@
  *
  * Author: Mohit Sakhuja
  */
+
 #include "helpers.hpp"
 
 // Some colors and sounds.
@@ -45,6 +46,18 @@ Order::Order(unsigned int id, string customer_name)
 
 
 /**
+ * Destructor for this class.
+ * Needed to free memory allocated to the vector.
+ */
+Order::~Order(void)
+{
+    // Creates a temporary, empty vector and
+    // swaps it with the allocated vector.
+    vector<Item>().swap(this->items);
+}
+
+
+/**
  * Member function to add an item to the current order.
  */
 void Order::add_item(Item item)
@@ -54,27 +67,11 @@ void Order::add_item(Item item)
 
 
 /**
- * Member function to show all items that have been added to the current bill.
- */
-void Order::show_items(void)
-{
-    for (int i = 0, size = items.size(); i < size; i++)
-    {
-        cout << items[i].name << endl;
-    }
-}
-
-
-/**
- * Member function of this class that displays the current
- * state of the user's cart.
+ * Member function of this class that displays the menu.
  */
 void Order::show_menu(void)
 {
     clear_screen();
-    // A little bit of greeting.
-    cout << GREEN << "Welcome to our supermarket!" << RESET << endl;
-    system("sleep 2");
 
     // Display the menu in a formatted manner.
     cout << "Here's the list of items we have:\n";
@@ -89,20 +86,13 @@ void Order::show_menu(void)
              << right << setfill(' ') << setw(4) << items[i].cost << "\t*\n";
     }
 
-    // Ask for the user's choice.
-    cout << "\nWhat would you like to buy?\n"
-         << CYAN << "Please enter the ID of that item.\n" << RESET;
-
-    // Options change depending upon the state of the cart.
-    if (items_in_cart > 0)
-    {
-        cout << "Enter \"-1\" to " << GREEN << "checkout" << RESET
-             << " or \"-2\" to " << RED << "quit" << RESET << ".\n";
-    }
-    else
-    {
-        cout << "Or enter \"-2\" to " << RED << "quit" << RESET <<".\n";
-    }
+    // Show options
+    cout << CYAN << "\nChoose one of the options below:\n" << RESET;
+    cout << "1. Enter the ID of the item you would like to buy (0-7)" << endl;
+    cout << "2. Enter '10' to view your cart" << endl;
+    cout << "3. Enter '20' to checkout" << endl;
+    cout << "4. Enter '500' to quit" << endl;
+    cout << "\nChoice: ";
 }
 
 
@@ -125,33 +115,37 @@ void Order::calculate_bill(void)
  */
 void Order::change_quantity(unsigned int item_id)
 {
+    clear_screen();
+
     unsigned int qty;
     cout << "How much of " << this->items[item_id].name << " do you want to buy? ";
     cin >> qty;
 
     while (qty > this->items[item_id].max_quantity)
     {
-        cout << BEEP << "The order quantity for this product is ";
-        cout << "limited to " << this->items[item_id].max_quantity << " per customer!\n";
-        system("sleep 1");
+        cout << BEEP << "\nThe order quantity for this product is ";
+        cout << "limited to " << this->items[item_id].max_quantity << " per customer!" << endl;
         cout << YELLOW << "Please choose a reasonable quantity.\n" << RESET;
         cin >> qty;
     }
 
     this->items[item_id].quantity = qty;
-    this->items[item_id].net_cost = this->items[id].calculate_net_cost();
-    cout << "\n" << this->items[item_id].quantity << " " << this->items[item_id].name << " in cart.\n";
+    items[item_id].net_cost = items[item_id].quantity * items[item_id].cost;
     this->calculate_bill();
+    cout << "\n" << this->items[item_id].quantity << " " << this->items[item_id].name << " in cart.\n";
     system("sleep 1");
 }
 
 
 /**
- * Member function to produce the bill for the current order.
+ * Member function to view the cart.
  */
-void Order::produce_bill(void)
+void Order::view_cart(void)
 {
-    cout << "Here's the bill for your order:\n";
+    clear_screen();
+
+    cout << BLUE << "\t\tYOUR CART" << RESET << endl;
+
     cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
          << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
     for (int i = 0, size = items.size(); i < size; i++)
@@ -164,40 +158,39 @@ void Order::produce_bill(void)
              << right << setfill(' ') << setw(4) << items[i].net_cost << "\t*\n";
     }
 
-    cout << "Total:\t\t\t" << this->bill << endl;
-    cout << GREEN << "Thank you for shopping with us!" << RESET << endl;
+    cout << "\nTotal:\t\t\t\t\t" << this->bill << endl;
+
+    cout << "\nPress Enter to continue";
+    system("read");
 }
 
 
 /**
- * A friend function for this class
- * that returns the number of items in the cart.
+ * Member function to produce the bill for the current order.
  */
-unsigned int get_cart_size(Order &order)
+void Order::produce_bill(void)
 {
-    order.items_in_cart = 0;
-    for (int i = 0; i < order.items.size(); i++)
+    clear_screen();
+
+    cout << "Here's the bill for your order:\n";
+
+    cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
+         << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
+    for (int i = 0, size = items.size(); i < size; i++)
     {
-        order.items_in_cart += order.items[i].quantity;
+        cout << " *   ";
+        cout << right << setfill('0') << setw(2) << items[i].number << "\t"
+             << left << setfill(' ') << setw(15) << items[i].name << "\t"
+             << right << setfill(' ') << setw(4) << items[i].cost << "\t"
+             << setfill('0') << setw(2) << items[i].quantity << "\t"
+             << right << setfill(' ') << setw(4) << items[i].net_cost << "\t*\n";
     }
 
-    return order.items_in_cart;
+    cout << "Total:\t\t\t\t\t" << this->bill << endl;
+    cout << GREEN << "Thank you for shopping with us!" << RESET << endl;
 }
 
 /********************* END *********************/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -217,7 +210,7 @@ Item::Item(unsigned int number, string name,
     this->cost          = cost;
     this->quantity      = quantity;
     this->max_quantity  = max_quantity;
-    this->net_cost      = calculate_net_cost();
+    this->net_cost      = this->cost * this->quantity;
 }
 
 /**
@@ -233,18 +226,34 @@ void Item::operator = (Item &item)
     this->net_cost      = item.net_cost;
 }
 
+/********************* END *********************/
+
+
+
+
+/********************* Friend function declarations *********************/
 
 /**
- * Explicitly declared inline function
- * that returns the total cost for an item
+ * A friend function for both classes
+ * that returns the number of items in the cart.
  */
-inline float Item::calculate_net_cost(void)
+unsigned int get_cart_size(Order &order)
 {
-    return this->cost * this->quantity;
+    order.items_in_cart = 0;
+    for (int i = 0, size = order.items.size(); i < size; i++)
+    {
+        order.items_in_cart += order.items[i].quantity;
+    }
+
+    return order.items_in_cart;
 }
 
 /********************* END *********************/
 
+
+
+
+/********************* Non-member, non-friend function declarations *********************/
 
 /**
  * Non-member, non-friend function
@@ -255,6 +264,32 @@ void clear_screen(void)
     std::cout << "\033[2J\n" << "\033[0;0H";
 }
 
+
+/**
+ * Non-member, non-friend function
+ * which is used to greet the user at startup
+ */
+void greet(void)
+{
+    clear_screen();
+    cout << GREEN << "Welcome to our supermarket!" << RESET << endl;
+    system("sleep 2.5");
+}
+
+
+/**
+ * Non-member, non-friend function
+ * which is used to tell the user that
+ * the entered option is invalid.
+ */
+void invalid_option(void)
+{
+    cout << BEEP << RED << "\nThe option you've entered is invalid" << RESET << endl;
+    cout << "Please enter a valid option." << endl;
+    system("sleep 3");
+}
+
+
 /**
  * Housekeeping function
  */
@@ -262,3 +297,5 @@ void housekeeping(Item *items)
 {
     delete[] items;
 }
+
+/********************* END *********************/
