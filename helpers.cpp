@@ -69,7 +69,7 @@ void Order::add_item(Item item)
 /**
  * Member function of this class that displays the menu.
  */
-void Order::show_menu(void)
+void Order::show_menu(void) const
 {
     clear_screen();
 

@@ -36,8 +36,6 @@ class Item
         Item(unsigned int number, string name,
             float cost, unsigned int quantity = 0,
             unsigned int max_quantity = 5);
-        // private member function
-        float calculate_net_cost(void);
 
         void operator = (Item &item);
 
@@ -65,7 +63,7 @@ class Order
         Order(unsigned int id, string customer_name);
         ~Order(void);
         void add_item(Item item);
-        void show_menu(void);
+        void show_menu(void) const;
         void change_quantity(unsigned int item_id);
         void produce_bill(void);
         void calculate_bill(void);
