@@ -1,7 +1,5 @@
 /** A supermarket billing system
- * that takes the order of a customer and prints the bill,
- * maintains the inventory,
- * and the income for each day.
+ * that takes the order of a customer and prints the bill.
  *
  * Author: Mohit Sakhuja
  */
