@@ -18,87 +18,62 @@
 #define RESET   "\x1b[0m"
 #define ESC     "\x1b["
 
+const int VIEW_CART = 1000;
+const int CHECKOUT  = 2000;
+const int QUIT      = 5000;
 
-/**************** Definitions for class - Order ****************/
-
-/**
- * Default constructor for this class
- */
-Order::Order(void)
+// Constructor for class `Order`
+Order::Order(string customer_name)
 {
     this->id            = 0;
-    this->items_in_cart = 0;
-    this->customer_name = "Customer";
-    this->bill          = 0;
-}
-
-
-/**
- * Parameterized constructor for this class
- */
-Order::Order(unsigned int id, string customer_name)
-{
-    this->id            = id;
     this->items_in_cart = 0;
     this->customer_name = customer_name;
     this->bill          = 0;
 }
 
-
-/**
- * Destructor for this class.
- * Needed to free memory allocated to the vector.
- */
+// Destructor for class `Order`
 Order::~Order(void)
 {
     // Creates a temporary, empty vector and
-    // swaps it with the allocated vector.
+    // swaps it with the allocated vector
     vector<Item>().swap(this->items);
 }
 
-
-/**
- * Member function to add an item to the current order.
- */
-void Order::add_item(Item item)
-{
-    items.push_back(item);
-}
-
-
-/**
- * Member function of this class that displays the menu.
- */
+// Member function of `Order` class to display the menu
 void Order::show_menu(void) const
 {
     clear_screen();
 
-    // Display the menu in a formatted manner.
+    // Display the column headings in a formatted manner
     cout << "Here's the list of items we have:\n";
-    cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
-         << "Quantity\t" << "Cost" << RESET << "\t*\n";
+    cout << BLUE << "*****"
+         << right << setfill(' ') << setw(4) << "ID"
+         << setw(20) << "Item name"
+         << setw(10) << "Cost"
+         << left << "  *****"
+         << RESET << endl;
+
+    // Display the menu items in a formatted manner
     for (int i = 0, size = items.size(); i < size; i++)
     {
-        cout << " *   ";
-        cout << right << setfill('0') << setw(2) << items[i].number << "\t"
-             << left << setfill(' ') << setw(15) << items[i].name << "\t"
-             << setfill('0') << setw(2) << items[i].quantity << "\t"
-             << right << setfill(' ') << setw(4) << items[i].cost << "\t*\n";
+        cout << "     "
+             << right << setfill(' ') << setw(4) << items[i].id
+             << setw(20) << items[i].name
+             << setw(10) << items[i].cost
+             << RESET << endl;
     }
 
     // Show options
     cout << CYAN << "\nChoose one of the options below:\n" << RESET;
-    cout << "1. Enter the ID of the item you would like to buy (0-7)" << endl;
-    cout << "2. Enter '10' to view your cart" << endl;
-    cout << "3. Enter '20' to checkout" << endl;
-    cout << "4. Enter '500' to quit" << endl;
+    cout << "1. Enter the ID of the item you would like to buy" << endl;
+    cout << "2. Enter '" << VIEW_CART << "' to view your cart" << endl;
+    cout << "3. Enter '" << CHECKOUT << "' to checkout" << endl;
+    cout << "4. Enter '" << QUIT << "' to quit" << endl;
     cout << "\nChoice: ";
 }
 
 
-/**
- * Member function to calculate the bill.
- */
+// Member function of `Order` class to calculate bill
 void Order::calculate_bill(void)
 {
     this->bill = 0;
@@ -137,9 +112,7 @@ void Order::change_quantity(unsigned int item_id)
 }
 
 
-/**
- * Member function to view the cart.
- */
+// Display the cart items
 void Order::view_cart(void)
 {
     clear_screen();
@@ -151,7 +124,7 @@ void Order::view_cart(void)
     for (int i = 0, size = items.size(); i < size; i++)
     {
         cout << " *   ";
-        cout << right << setfill('0') << setw(2) << items[i].number << "\t"
+        cout << right << setfill('0') << setw(2) << items[i].id << "\t"
              << left << setfill(' ') << setw(15) << items[i].name << "\t"
              << right << setfill(' ') << setw(4) << items[i].cost << "\t"
              << setfill('0') << setw(2) << items[i].quantity << "\t"
@@ -165,9 +138,7 @@ void Order::view_cart(void)
 }
 
 
-/**
- * Member function to produce the bill for the current order.
- */
+// Produce bill for the current order
 void Order::produce_bill(void)
 {
     clear_screen();
@@ -179,7 +150,7 @@ void Order::produce_bill(void)
     for (int i = 0, size = items.size(); i < size; i++)
     {
         cout << " *   ";
-        cout << right << setfill('0') << setw(2) << items[i].number << "\t"
+        cout << right << setfill('0') << setw(2) << items[i].id << "\t"
              << left << setfill(' ') << setw(15) << items[i].name << "\t"
              << right << setfill(' ') << setw(4) << items[i].cost << "\t"
              << setfill('0') << setw(2) << items[i].quantity << "\t"
@@ -197,15 +168,12 @@ void Order::produce_bill(void)
 
 /**************** Definitions for class - Item ****************/
 
-/**
- * Constructor for this class,
- * having some default arguments declared in the header file.
- */
-Item::Item(unsigned int number, string name,
+// Constructor for class `Item`
+Item::Item(unsigned int id, string name,
     float cost, unsigned int quantity,
     unsigned int max_quantity)
 {
-    this->number        = number;
+    this->id            = id;
     this->name          = name;
     this->cost          = cost;
     this->quantity      = quantity;
@@ -213,12 +181,10 @@ Item::Item(unsigned int number, string name,
     this->net_cost      = this->cost * this->quantity;
 }
 
-/**
- * Overloaded assignment operator for this class.
- */
+// Copies an item object to another
 void Item::operator = (Item &item)
 {
-    this->number        = item.number;
+    this->id            = item.id;
     this->name          = item.name;
     this->cost          = item.cost;
     this->quantity      = item.quantity;
@@ -233,10 +199,8 @@ void Item::operator = (Item &item)
 
 /********************* Friend function declarations *********************/
 
-/**
- * A friend function for both classes
- * that returns the number of items in the cart.
- */
+// Friend of both classes that
+// returns the number of items in the cart
 unsigned int get_cart_size(Order &order)
 {
     order.items_in_cart = 0;
@@ -255,33 +219,32 @@ unsigned int get_cart_size(Order &order)
 
 /********************* Non-member, non-friend function declarations *********************/
 
-/**
- * Non-member, non-friend function
- * which is just used to clear the screen
- */
+// C-style function to clear the screen
 void clear_screen(void)
 {
     std::cout << "\033[2J\n" << "\033[0;0H";
 }
 
-
-/**
- * Non-member, non-friend function
- * which is used to greet the user at startup
- */
+// C-style function to greet the user at startup
 void greet(void)
 {
     clear_screen();
     cout << GREEN << "Welcome to our supermarket!" << RESET << endl;
     system("sleep 2.5");
+    clear_screen();
 }
 
+// C-style function to get customer's name
+void get_customer_name(void)
+{
+    cout << "Please enter customer's name: ";
+    getline(cin, order.customer_name);
+    cout << GREEN << "Welcome, " << order.customer_name << RESET << endl;
+    system("sleep 2");
+    clear_screen();
+}
 
-/**
- * Non-member, non-friend function
- * which is used to tell the user that
- * the entered option is invalid.
- */
+// C-style function to tell the user that the entered option is invalid
 void invalid_option(void)
 {
     cout << BEEP << RED << "\nThe option you've entered is invalid" << RESET << endl;
@@ -290,12 +253,13 @@ void invalid_option(void)
 }
 
 
-/**
- * Housekeeping function
- */
+// C-style function to cleanup items
 void housekeeping(Item *items)
 {
     delete[] items;
 }
+
+// Global variables
+Order order = Order();
 
 /********************* END *********************/

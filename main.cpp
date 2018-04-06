@@ -5,79 +5,87 @@
  */
 
 #include "helpers.hpp"
+#include "sqlite_wrapper.hpp"
 
 using namespace std;
 
 int main(void)
 {
-    // hard coded items
-    Item *hc_items = new Item[8] {
-        Item(0, "Biscuits", 20),
-        Item(1, "Chips", 25),
-        Item(2, "Pulses", 190, 0, 4),
-        Item(3, "Detergents", 95, 0, 8),
-        Item(4, "Cream", 350, 0, 4),
-        Item(5, "Oil", 225),
-        Item(6, "Soap", 45),
-        Item(7, "Bedsheet", 1100, 0, 6)
-    };
+    greet();
 
-    // hard coded order
-    Order order = Order(123, "Mohit Sakhuja");
-    for (int i = 0; i < 8; i++)
+    get_customer_name();
+
+    // Get last order id
+    try
     {
-        order.add_item(hc_items[i]);
+        db_order.execute("SELECT MAX(order_id) FROM orders;");
+    }
+    catch (int error)
+    {
+        cerr << "Error code: " << error << endl;
+        cerr << "Error getting last order id." << endl;
+        cerr << "Error: " << db_order.errmsg << endl;
+        return 1;
     }
 
-    // housekeeping for items
-    housekeeping(hc_items);
+    // Read items from the database and add them to the order
+    try
+    {
+        db_items.execute("SELECT * FROM items;");
+    }
+    catch (int error)
+    {
+        cerr << "Error code: " << error << endl;
+        cerr << "Error adding items to the order." << endl;
+        cerr << "Error: " << db_items.errmsg << endl;
+        return 1;
+    }
+
+    order.show_menu();
 
     int choice;
-
-    greet();
-    order.show_menu();
     cin >> choice;
 
-    while (true)
-    {
-        switch (choice)
-        {
-            case 0 ... 7:
-                // Change the quantity for an item/Add an item
-                order.change_quantity(choice);
-                break;
+    // while (true)
+    // {
+    //     switch (choice)
+    //     {
+    //         case 0 ... 7:
+    //             // Change the quantity for an item/Add an item
+    //             order.change_quantity(choice);
+    //             break;
 
-            case 10:
-                // View cart
-                order.view_cart();
-                break;
+    //         case 10:
+    //             // View cart
+    //             order.view_cart();
+    //             break;
 
-            case 20:
-                // Produce bill
-                char option;
-                cout << "Are you sure you don't want to buy anything else? (y/n) ";
-                cin >> option;
+    //         case 20:
+    //             // Produce bill
+    //             char option;
+    //             cout << "Are you sure you don't want to buy anything else? (y/n) ";
+    //             cin >> option;
 
-                if (option == 'y')
-                {
-                    order.produce_bill();
-                    return 0;
-                }
-                break;
+    //             if (option == 'y')
+    //             {
+    //                 order.produce_bill();
+    //                 return 0;
+    //             }
+    //             break;
 
-            case 500:
-                // Quit
-                return 0;
+    //         case 500:
+    //             // Quit
+    //             return 0;
 
-            default:
-                // Invalid option
-                invalid_option();
-                break;
-        }
+    //         default:
+    //             // Invalid option
+    //             invalid_option();
+    //             break;
+    //     }
 
-        order.show_menu();
-        cin >> choice;
-    }
+    //     order.show_menu();
+    //     cin >> choice;
+    // }
 
     // success
     return 0;
