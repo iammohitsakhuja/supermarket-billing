@@ -60,19 +60,33 @@ int main(void)
 
             // Produce bill
             case CHECKOUT:
+            {
                 char option;
                 cout << "Are you sure you don't want to buy anything else? (y/n) ";
                 cin >> option;
 
                 if (option == 'y')
                 {
-                    order.produce_bill();
+                    try
+                    {
+                        order.produce_bill();
+                    }
+                    catch (int error)
+                    {
+                        cerr << "Error code: " << error << endl;
+                        cerr << "Error producing bill." << endl;
+                        cout << "Some transactions may not have been undone." << endl;
+                        cerr << "Error: " << db_order.errmsg << endl;
+                        return 1;
+                    }
                     return 0;
                 }
                 break;
+            }
 
             // Quit
             case QUIT:
+            {
                 char option;
                 cout << "Are you sure you want to quit without buying? (y/n) ";
                 cin >> option;
@@ -82,6 +96,7 @@ int main(void)
                     return 0;
                 }
                 break;
+            }
 
             default:
                 if (choice >= 1 && choice <= last_item_id)

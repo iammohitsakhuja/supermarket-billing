@@ -53,7 +53,7 @@ class Order
         ~Order(void);
         void show_menu(void) const;
         void change_quantity(unsigned int item_id);
-        void produce_bill(void);
+        void produce_bill(void) throw (int);
         void calculate_bill(void);
         void view_cart(void);
 };
@@ -62,6 +62,7 @@ void clear_screen(void);
 void greet(void);
 void get_customer_name(void);
 void invalid_option(void);
+void save_and_quit(void) throw (int);
 
 extern Order order;
 

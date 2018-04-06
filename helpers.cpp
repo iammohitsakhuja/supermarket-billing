@@ -6,6 +6,7 @@
  */
 
 #include "helpers.hpp"
+#include "sqlite_wrapper.hpp"
 
 // Some colors and sounds.
 #define BEEP    "\a"
@@ -72,6 +73,7 @@ void Order::view_cart(void)
 {
     clear_screen();
 
+    // Show headings
     cout << BLUE << right << setfill(' ') << setw(38) << "YOUR CART" << RESET << endl;
 
     cout << BLUE << "*****"
@@ -83,6 +85,7 @@ void Order::view_cart(void)
          << left << "  *****"
          << RESET << endl;
 
+    // Show only items added into cart
     for (int i = 0, size = items.size(); i < size; i++)
     {
         if (items[i].quantity > 0)
@@ -99,7 +102,7 @@ void Order::view_cart(void)
 
     cout << GREEN << "\n\nTotal: " << RESET << this->bill << endl;
 
-    cout << "\nPress Enter to continue";
+    cout << "\nPress Enter to continue\n";
     system("read");
 }
 
@@ -116,6 +119,7 @@ void Order::change_quantity(unsigned int item_id)
     cout << "How much of " << items[item_id].name << " do you want to buy? ";
     cin >> qty;
 
+    // Make sure the quantity for that item is available
     while (qty > items[item_id].max_quantity)
     {
         clear_screen();
@@ -151,12 +155,21 @@ void Order::calculate_bill(void)
 }
 
 // Produce bill for the current order and save transaction to database
-void Order::produce_bill(void)
+void Order::produce_bill(void) throw (int)
 {
     clear_screen();
 
+    try
+    {
+        save_and_quit();
+    }
+    catch (int error)
+    {
+        throw;
+    }
+
+    // Show headings
     cout << BLUE << right << setfill(' ') << setw(33) << "YOUR BILL" << RESET << endl;
-    // cout << "Here's the bill for your order:\n";
 
     cout << BLUE << "*****"
          << right << setfill(' ')
@@ -167,6 +180,7 @@ void Order::produce_bill(void)
          << left << "  *****"
          << RESET << endl;
 
+    // Display only the items purchased
     for (int i = 0, size = items.size(); i < size; i++)
     {
         if (items[i].quantity > 0)
@@ -185,6 +199,55 @@ void Order::produce_bill(void)
 
     cout << "\nThank you " << MAGENTA << this->customer_name
          << RESET << ", for shopping with us!" << endl;
+}
+
+// Save and quit after producing the bill
+void save_and_quit(void) throw (int)
+{
+    try
+    {
+        for (int i = 0, size = order.items.size(); i < size; i++)
+        {
+            if (order.items[i].quantity > 0)
+            {
+                db_order.execute("INSERT INTO %s VALUES(%d, %s, %d, %d);", "orders", order.id, order.customer_name.c_str(), order.items[i].id, order.items[i].quantity);
+            }
+        }
+    }
+    catch (int error)
+    {
+        throw;
+    }
+
+    try
+    {
+        for (int i = 0, size = order.items.size(); i < size; i++)
+        {
+            if (order.items[i].quantity > 0)
+            {
+                // Calculate remaining quantity
+                int quantity_left = order.items[i].max_quantity - order.items[i].quantity;
+
+                // Update database
+                db_items.execute("UPDATE %s SET %s = %d WHERE %s = %d;", "items", "quantity", quantity_left, "item_id", order.items[i].id);
+            }
+        }
+    }
+    catch (int error)
+    {
+        try
+        {
+            db_order.execute("DELETE FROM %s WHERE %s = %d;", "orders", "order_id", order.id);
+        }
+        catch (int err)
+        {
+            cerr << "Error code: " << err << endl;
+            cerr << "Error undo-ing last transaction on table `orders`" << endl;
+            cerr << "Error: " << db_order.errmsg << endl;
+        }
+
+        throw error;
+    }
 }
 
 // Constructor for class `Item`
