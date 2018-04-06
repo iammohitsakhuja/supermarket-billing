@@ -107,6 +107,40 @@ void Order::view_cart(void)
     system("read");
 }
 
+// Change quantity for a particular item
+void Order::change_quantity(unsigned int item_id)
+{
+    clear_screen();
+
+    // Get the index for the current item id
+    item_id--;
+
+    // Ask the user about the quantity for that item
+    unsigned int qty;
+    cout << "How much of " << items[item_id].name << " do you want to buy? ";
+    cin >> qty;
+
+    while (qty > items[item_id].max_quantity)
+    {
+        cout << BEEP
+             << "\nThe order quantity for this product is limited to "
+             << items[item_id].max_quantity << " units per customer!\n"
+             << YELLOW << "Please choose a reasonable quantity.\n"
+             << RESET;
+        cin >> qty;
+    }
+
+    // Set the quantity and net cost of the item accordingly
+    items[item_id].quantity = qty;
+    items[item_id].net_cost = items[item_id].quantity * items[item_id].cost;
+
+    // Maintain a track of new bill
+    calculate_bill();
+
+    cout << "\n" << items[item_id].quantity << " units of " << items[item_id].name << " in cart.\n";
+    system("sleep 2");
+}
+
 // Member function of `Order` class to calculate bill
 void Order::calculate_bill(void)
 {
@@ -116,37 +150,6 @@ void Order::calculate_bill(void)
         this->bill += items[i].net_cost;
     }
 }
-
-
-/**
- * Member function to get the new quantity for a particular item,
- * index of which is received as an argument.
- */
-void Order::change_quantity(unsigned int item_id)
-{
-    clear_screen();
-
-    unsigned int qty;
-    cout << "How much of " << this->items[item_id].name << " do you want to buy? ";
-    cin >> qty;
-
-    while (qty > this->items[item_id].max_quantity)
-    {
-        cout << BEEP << "\nThe order quantity for this product is ";
-        cout << "limited to " << this->items[item_id].max_quantity << " per customer!" << endl;
-        cout << YELLOW << "Please choose a reasonable quantity.\n" << RESET;
-        cin >> qty;
-    }
-
-    this->items[item_id].quantity = qty;
-    items[item_id].net_cost = items[item_id].quantity * items[item_id].cost;
-    this->calculate_bill();
-    cout << "\n" << this->items[item_id].quantity << " " << this->items[item_id].name << " in cart.\n";
-    system("sleep 1");
-}
-
-
-
 
 
 // Produce bill for the current order
@@ -180,9 +183,7 @@ void Order::produce_bill(void)
 /**************** Definitions for class - Item ****************/
 
 // Constructor for class `Item`
-Item::Item(unsigned int id, string name,
-    float cost, unsigned int quantity,
-    unsigned int max_quantity)
+Item::Item(unsigned int id, string name, float cost, unsigned int quantity, unsigned int max_quantity)
 {
     this->id            = id;
     this->name          = name;

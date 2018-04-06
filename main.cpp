@@ -9,8 +9,6 @@
 
 using namespace std;
 
-// extern Order order;
-
 int main(void)
 {
     greet();
@@ -42,6 +40,9 @@ int main(void)
         cerr << "Error: " << db_items.errmsg << endl;
         return 1;
     }
+
+    // Get the ID of the last item
+    int last_item_id = order.items[order.items.size() - 1].id;
 
     order.show_menu();
 
@@ -76,7 +77,7 @@ int main(void)
                 return 0;
 
             default:
-                if (choice >= 1 && choice <= order.id)
+                if (choice >= 1 && choice <= last_item_id)
                 {
                     // Change the quantity for an item/Add an item
                     order.change_quantity(choice);

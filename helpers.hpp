@@ -35,7 +35,7 @@ class Item
         float net_cost;
 
         // Member functions
-        Item(unsigned int id, string name, float cost, unsigned int quantity = 0, unsigned int max_quantity = 5);
+        Item(unsigned int id, string name, float cost, unsigned int quantity, unsigned int max_quantity);
         void operator = (Item &item);
         ~Item(void)
         {
@@ -54,7 +54,7 @@ class Order
         unsigned int id;
         unsigned int items_in_cart;
         string customer_name;
-        double bill;
+        float bill;
         vector<Item> items;
 
         // Member functions
