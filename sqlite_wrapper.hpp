@@ -32,7 +32,6 @@ class Database
 
         // execute SQL commands
         void execute(const char *command, ...) __attribute__((format(__printf__, 2, 3)));
-        // int execute(const char *command, ...) __attribute__((format(__printf__, 2, 3)));
 
         // close connection
         ~Database(void);

@@ -7,6 +7,7 @@
 
 #include "helpers.hpp"
 #include "sqlite_wrapper.hpp"
+#include <iomanip>
 
 // Some colors and sounds.
 #define BEEP    "\a"
@@ -198,19 +199,20 @@ void Order::produce_bill(void) throw (int)
     cout << GREEN << "\n\nTotal: " << RESET << this->bill << endl;
 
     cout << "\nThank you " << MAGENTA << this->customer_name
-         << RESET << ", for shopping with us!" << endl;
+         << RESET << ", for shopping with us!\n" << endl;
 }
 
 // Save and quit after producing the bill
 void save_and_quit(void) throw (int)
 {
+    // Insert entries into `orders` table
     try
     {
         for (int i = 0, size = order.items.size(); i < size; i++)
         {
             if (order.items[i].quantity > 0)
             {
-                db_order.execute("INSERT INTO %s VALUES(%d, %s, %d, %d);", "orders", order.id, order.customer_name.c_str(), order.items[i].id, order.items[i].quantity);
+                db_order.execute("INSERT INTO %s VALUES(%d, \"%s\", %d, %d);", "orders", order.id, (order.customer_name).c_str(), order.items[i].id, order.items[i].quantity);
             }
         }
     }
@@ -219,6 +221,7 @@ void save_and_quit(void) throw (int)
         throw;
     }
 
+    // Update `items` table
     try
     {
         for (int i = 0, size = order.items.size(); i < size; i++)
@@ -235,6 +238,7 @@ void save_and_quit(void) throw (int)
     }
     catch (int error)
     {
+        // If updating `items` table fails, remove the entries inserted into `orders` table
         try
         {
             db_order.execute("DELETE FROM %s WHERE %s = %d;", "orders", "order_id", order.id);

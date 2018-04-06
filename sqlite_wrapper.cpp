@@ -28,24 +28,37 @@ void Database::execute(const char *command, ...)
 {
     char *formatted_cmd = new char[strlen(command) + 100];
 
+    // Format the given command
     va_list ap;
     va_start(ap, command);
     vsprintf(formatted_cmd, command, ap);
 
     int return_code;
+
+    // Check if command is for getting the max order id
     if (strcasestr(formatted_cmd, "max(order_id)") != NULL)
     {
         return_code = sqlite3_exec(db, formatted_cmd, callback_max_order_id, NULL, &errmsg);
     }
+    // Else check if it is for selecting all items
     else if (!strcasecmp(formatted_cmd, "select * from items;"))
     {
         return_code = sqlite3_exec(db, formatted_cmd, callback_add_items_to_order, NULL, &errmsg);
     }
+    // Else check if it is an update, insert or a delete command
+    else if ((strcasestr(formatted_cmd, "insert") != NULL) ||
+             (strcasestr(formatted_cmd, "update") != NULL) ||
+             (strcasestr(formatted_cmd, "delete") != NULL))
+    {
+        return_code = sqlite3_exec(db, formatted_cmd, NULL, NULL, &errmsg);
+    }
+    // Else just run the given command
     else
     {
         return_code = sqlite3_exec(db, formatted_cmd, callback, NULL, &errmsg);
     }
 
+    // Cleanup
     delete[] formatted_cmd;
     va_end(ap);
 
@@ -55,7 +68,7 @@ void Database::execute(const char *command, ...)
     }
 }
 
-// Sample callback function
+// Generic callback function that prints any rows returned to it
 int Database::callback(void *unused, int col_count, char **col_data, char **col_name)
 {
     static int records = 0;

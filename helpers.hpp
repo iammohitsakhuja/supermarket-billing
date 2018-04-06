@@ -10,10 +10,7 @@
 #define HELPERS_HPP
 
 #include <iostream>
-#include <iomanip>
 #include <vector>
-#include <iterator>
-#include <cstdlib>
 
 #define VIEW_CART 1000
 #define CHECKOUT  2000
