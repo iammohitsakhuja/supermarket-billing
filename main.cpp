@@ -5,73 +5,110 @@
  */
 
 #include "helpers.hpp"
+#include "sqlite_wrapper.hpp"
 
 using namespace std;
 
 int main(void)
 {
-    // hard coded items
-    Item *hc_items = new Item[8] {
-        Item(0, "Biscuits", 20),
-        Item(1, "Chips", 25),
-        Item(2, "Pulses", 190, 0, 4),
-        Item(3, "Detergents", 95, 0, 8),
-        Item(4, "Cream", 350, 0, 4),
-        Item(5, "Oil", 225),
-        Item(6, "Soap", 45),
-        Item(7, "Bedsheet", 1100, 0, 6)
-    };
+    greet();
 
-    // hard coded order
-    Order order = Order(123, "Mohit Sakhuja");
-    for (int i = 0; i < 8; i++)
+    get_customer_name();
+
+    // Get last order id
+    try
     {
-        order.add_item(hc_items[i]);
+        db_order.execute("SELECT %s FROM %s;", "MAX(order_id)", "orders");
+    }
+    catch (int error)
+    {
+        cerr << "Error code: " << error << endl;
+        cerr << "Error getting last order id." << endl;
+        cerr << "Error: " << db_order.errmsg << endl;
+        return 1;
     }
 
-    // housekeeping for items
-    housekeeping(hc_items);
+    // Read items from the database and add them to the order
+    try
+    {
+        db_items.execute("SELECT %s FROM %s;", "*", "items");
+    }
+    catch (int error)
+    {
+        cerr << "Error code: " << error << endl;
+        cerr << "Error adding items to the order." << endl;
+        cerr << "Error: " << db_items.errmsg << endl;
+        return 1;
+    }
+
+    // Get the ID of the last item
+    int last_item_id = order.items[order.items.size() - 1].id;
+
+    order.show_menu();
 
     int choice;
-
-    greet();
-    order.show_menu();
     cin >> choice;
 
     while (true)
     {
         switch (choice)
         {
-            case 0 ... 7:
-                // Change the quantity for an item/Add an item
-                order.change_quantity(choice);
-                break;
-
-            case 10:
-                // View cart
+            // View cart
+            case VIEW_CART:
                 order.view_cart();
                 break;
 
-            case 20:
-                // Produce bill
+            // Produce bill
+            case CHECKOUT:
+            {
                 char option;
                 cout << "Are you sure you don't want to buy anything else? (y/n) ";
                 cin >> option;
 
                 if (option == 'y')
                 {
-                    order.produce_bill();
+                    try
+                    {
+                        order.produce_bill();
+                    }
+                    catch (int error)
+                    {
+                        cerr << "Error code: " << error << endl;
+                        cerr << "Error producing bill." << endl;
+                        cout << "Some transactions may not have been undone." << endl;
+                        cerr << "Error: " << db_order.errmsg << endl;
+                        return 1;
+                    }
                     return 0;
                 }
                 break;
+            }
 
-            case 500:
-                // Quit
-                return 0;
+            // Quit
+            case QUIT:
+            {
+                char option;
+                cout << "Are you sure you want to quit without buying? (y/n) ";
+                cin >> option;
+
+                if (option == 'y')
+                {
+                    return 0;
+                }
+                break;
+            }
 
             default:
-                // Invalid option
-                invalid_option();
+                if (choice >= 1 && choice <= last_item_id)
+                {
+                    // Change the quantity for an item/Add an item
+                    order.change_quantity(choice);
+                }
+                else
+                {
+                    // Invalid option
+                    invalid_option();
+                }
                 break;
         }
 
