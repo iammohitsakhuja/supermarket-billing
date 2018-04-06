@@ -73,8 +73,15 @@ int main(void)
 
             // Quit
             case QUIT:
-                // quit();
-                return 0;
+                char option;
+                cout << "Are you sure you want to quit without buying? (y/n) ";
+                cin >> option;
+
+                if (option == 'y')
+                {
+                    return 0;
+                }
+                break;
 
             default:
                 if (choice >= 1 && choice <= last_item_id)

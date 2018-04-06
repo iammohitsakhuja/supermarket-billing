@@ -22,7 +22,6 @@
 Order::Order(string customer_name)
 {
     this->id            = 0;
-    this->items_in_cart = 0;
     this->customer_name = customer_name;
     this->bill          = 0;
 }
@@ -73,7 +72,7 @@ void Order::view_cart(void)
 {
     clear_screen();
 
-    cout << BLUE << right << setfill(' ') << setw(20) << "YOUR CART" << RESET << endl;
+    cout << BLUE << right << setfill(' ') << setw(38) << "YOUR CART" << RESET << endl;
 
     cout << BLUE << "*****"
          << right << setfill(' ') << setw(4) << "ID"
@@ -84,8 +83,6 @@ void Order::view_cart(void)
          << left << "  *****"
          << RESET << endl;
 
-    // cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
-    //      << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
     for (int i = 0, size = items.size(); i < size; i++)
     {
         if (items[i].quantity > 0)
@@ -100,8 +97,7 @@ void Order::view_cart(void)
         }
     }
 
-    cout << GREEN << right << setfill(' ') << setw(61) << "Total: "
-         << RESET << this->bill << endl;
+    cout << GREEN << "\n\nTotal: " << RESET << this->bill << endl;
 
     cout << "\nPress Enter to continue";
     system("read");
@@ -122,11 +118,14 @@ void Order::change_quantity(unsigned int item_id)
 
     while (qty > items[item_id].max_quantity)
     {
-        cout << BEEP
-             << "\nThe order quantity for this product is limited to "
+        clear_screen();
+
+        cout << BEEP << "\nThe order quantity for "
+             << items[item_id].name << " is limited to "
              << items[item_id].max_quantity << " units per customer!\n"
-             << YELLOW << "Please choose a reasonable quantity.\n"
+             << YELLOW << "Please choose a reasonable quantity.\n\n"
              << RESET;
+        cout << "How much of " << items[item_id].name << " do you want to buy? ";
         cin >> qty;
     }
 
@@ -151,36 +150,42 @@ void Order::calculate_bill(void)
     }
 }
 
-
-// Produce bill for the current order
+// Produce bill for the current order and save transaction to database
 void Order::produce_bill(void)
 {
     clear_screen();
 
-    cout << "Here's the bill for your order:\n";
+    cout << BLUE << right << setfill(' ') << setw(33) << "YOUR BILL" << RESET << endl;
+    // cout << "Here's the bill for your order:\n";
 
-    cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
-         << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
+    cout << BLUE << "*****"
+         << right << setfill(' ')
+         << setw(15) << "Item name"
+         << setw(10) << "Cost"
+         << setw(10) << "Quantity"
+         << setw(15) << "Net cost"
+         << left << "  *****"
+         << RESET << endl;
+
     for (int i = 0, size = items.size(); i < size; i++)
     {
-        cout << " *   ";
-        cout << right << setfill('0') << setw(2) << items[i].id << "\t"
-             << left << setfill(' ') << setw(15) << items[i].name << "\t"
-             << right << setfill(' ') << setw(4) << items[i].cost << "\t"
-             << setfill('0') << setw(2) << items[i].quantity << "\t"
-             << right << setfill(' ') << setw(4) << items[i].net_cost << "\t*\n";
+        if (items[i].quantity > 0)
+        {
+            cout << "     "
+                 << right << setfill(' ')
+                 << setw(15) << items[i].name
+                 << setw(10) << items[i].cost
+                 << setw(10) << items[i].quantity
+                 << setw(15) << items[i].net_cost
+                 << RESET << endl;
+        }
     }
 
-    cout << "Total:\t\t\t\t\t" << this->bill << endl;
-    cout << GREEN << "Thank you for shopping with us!" << RESET << endl;
+    cout << GREEN << "\n\nTotal: " << RESET << this->bill << endl;
+
+    cout << "\nThank you " << MAGENTA << this->customer_name
+         << RESET << ", for shopping with us!" << endl;
 }
-
-/********************* END *********************/
-
-
-
-
-/**************** Definitions for class - Item ****************/
 
 // Constructor for class `Item`
 Item::Item(unsigned int id, string name, float cost, unsigned int quantity, unsigned int max_quantity)
@@ -203,33 +208,6 @@ void Item::operator = (Item &item)
     this->max_quantity  = item.max_quantity;
     this->net_cost      = item.net_cost;
 }
-
-/********************* END *********************/
-
-
-
-
-/********************* Friend function declarations *********************/
-
-// Friend of both classes that
-// returns the number of items in the cart
-unsigned int get_cart_size(Order &order)
-{
-    order.items_in_cart = 0;
-    for (int i = 0, size = order.items.size(); i < size; i++)
-    {
-        order.items_in_cart += order.items[i].quantity;
-    }
-
-    return order.items_in_cart;
-}
-
-/********************* END *********************/
-
-
-
-
-/********************* Non-member, non-friend function declarations *********************/
 
 // C-style function to clear the screen
 void clear_screen(void)
@@ -259,19 +237,12 @@ void get_customer_name(void)
 // C-style function to tell the user that the entered option is invalid
 void invalid_option(void)
 {
+    clear_screen();
+
     cout << BEEP << RED << "\nThe option you've entered is invalid" << RESET << endl;
     cout << "Please enter a valid option." << endl;
     system("sleep 3");
 }
 
-
-// C-style function to cleanup items
-void housekeeping(Item *items)
-{
-    delete[] items;
-}
-
 // Global variables
 Order order = Order();
-
-/********************* END *********************/

@@ -37,14 +37,6 @@ class Item
         // Member functions
         Item(unsigned int id, string name, float cost, unsigned int quantity, unsigned int max_quantity);
         void operator = (Item &item);
-        ~Item(void)
-        {
-            return ;
-        }
-
-        // common friend function for both classes,
-        // needed here to access the `quantity` of an item
-        friend unsigned int get_cart_size(Order &order);
 };
 
 class Order
@@ -52,7 +44,6 @@ class Order
     public:
         // Data members
         unsigned int id;
-        unsigned int items_in_cart;
         string customer_name;
         float bill;
         vector<Item> items;
@@ -65,16 +56,12 @@ class Order
         void produce_bill(void);
         void calculate_bill(void);
         void view_cart(void);
-
-        // common friend function for both classes
-        friend unsigned int get_cart_size(Order &order);
 };
 
 void clear_screen(void);
 void greet(void);
 void get_customer_name(void);
 void invalid_option(void);
-void housekeeping(Item *items);
 
 extern Order order;
 
