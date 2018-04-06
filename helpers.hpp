@@ -15,6 +15,10 @@
 #include <iterator>
 #include <cstdlib>
 
+#define VIEW_CART 1000
+#define CHECKOUT  2000
+#define QUIT      5000
+
 using namespace std;
 
 class Order;
@@ -22,6 +26,7 @@ class Order;
 class Item
 {
     public:
+        // Data members
         unsigned int id;
         string name;
         float cost;
@@ -29,14 +34,9 @@ class Item
         unsigned int max_quantity;
         float net_cost;
 
-        // friend class that wants to access private data of this class
-        friend class Order;
-
-    // public:
+        // Member functions
         Item(unsigned int id, string name, float cost, unsigned int quantity = 0, unsigned int max_quantity = 5);
-
         void operator = (Item &item);
-
         ~Item(void)
         {
             return ;
@@ -50,15 +50,14 @@ class Item
 class Order
 {
     public:
+        // Data members
         unsigned int id;
         unsigned int items_in_cart;
         string customer_name;
         double bill;
         vector<Item> items;
 
-    // public:
-        // Order(void);
-        // Order(unsigned int id, string customer_name);
+        // Member functions
         Order(string customer_name = "Customer");
         ~Order(void);
         void show_menu(void) const;

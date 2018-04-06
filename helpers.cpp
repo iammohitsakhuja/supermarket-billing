@@ -18,10 +18,6 @@
 #define RESET   "\x1b[0m"
 #define ESC     "\x1b["
 
-const int VIEW_CART = 1000;
-const int CHECKOUT  = 2000;
-const int QUIT      = 5000;
-
 // Constructor for class `Order`
 Order::Order(string customer_name)
 {
@@ -72,6 +68,44 @@ void Order::show_menu(void) const
     cout << "\nChoice: ";
 }
 
+// Display the cart items
+void Order::view_cart(void)
+{
+    clear_screen();
+
+    cout << BLUE << right << setfill(' ') << setw(20) << "YOUR CART" << RESET << endl;
+
+    cout << BLUE << "*****"
+         << right << setfill(' ') << setw(4) << "ID"
+         << setw(20) << "Item name"
+         << setw(10) << "Cost"
+         << setw(10) << "Quantity"
+         << setw(15) << "Net cost"
+         << left << "  *****"
+         << RESET << endl;
+
+    // cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
+    //      << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
+    for (int i = 0, size = items.size(); i < size; i++)
+    {
+        if (items[i].quantity > 0)
+        {
+            cout << "     "
+                 << right << setfill(' ') << setw(4) << items[i].id
+                 << setw(20) << items[i].name
+                 << setw(10) << items[i].cost
+                 << setw(10) << items[i].quantity
+                 << setw(15) << items[i].net_cost
+                 << RESET << endl;
+        }
+    }
+
+    cout << GREEN << right << setfill(' ') << setw(61) << "Total: "
+         << RESET << this->bill << endl;
+
+    cout << "\nPress Enter to continue";
+    system("read");
+}
 
 // Member function of `Order` class to calculate bill
 void Order::calculate_bill(void)
@@ -112,30 +146,7 @@ void Order::change_quantity(unsigned int item_id)
 }
 
 
-// Display the cart items
-void Order::view_cart(void)
-{
-    clear_screen();
 
-    cout << BLUE << "\t\tYOUR CART" << RESET << endl;
-
-    cout << " *   " << BLUE << "ID " << left << setfill(' ') << setw(13) << "Item name"
-         << "Cost\t" << "Quantity   Net Cost" << RESET << "\t*\n";
-    for (int i = 0, size = items.size(); i < size; i++)
-    {
-        cout << " *   ";
-        cout << right << setfill('0') << setw(2) << items[i].id << "\t"
-             << left << setfill(' ') << setw(15) << items[i].name << "\t"
-             << right << setfill(' ') << setw(4) << items[i].cost << "\t"
-             << setfill('0') << setw(2) << items[i].quantity << "\t"
-             << right << setfill(' ') << setw(4) << items[i].net_cost << "\t*\n";
-    }
-
-    cout << "\nTotal:\t\t\t\t\t" << this->bill << endl;
-
-    cout << "\nPress Enter to continue";
-    system("read");
-}
 
 
 // Produce bill for the current order

@@ -9,6 +9,8 @@
 
 using namespace std;
 
+// extern Order order;
+
 int main(void)
 {
     greet();
@@ -18,7 +20,7 @@ int main(void)
     // Get last order id
     try
     {
-        db_order.execute("SELECT MAX(order_id) FROM orders;");
+        db_order.execute("SELECT %s FROM %s;", "MAX(order_id)", "orders");
     }
     catch (int error)
     {
@@ -31,7 +33,7 @@ int main(void)
     // Read items from the database and add them to the order
     try
     {
-        db_items.execute("SELECT * FROM items;");
+        db_items.execute("SELECT %s FROM %s;", "*", "items");
     }
     catch (int error)
     {
@@ -46,46 +48,50 @@ int main(void)
     int choice;
     cin >> choice;
 
-    // while (true)
-    // {
-    //     switch (choice)
-    //     {
-    //         case 0 ... 7:
-    //             // Change the quantity for an item/Add an item
-    //             order.change_quantity(choice);
-    //             break;
+    while (true)
+    {
+        switch (choice)
+        {
+            // View cart
+            case VIEW_CART:
+                order.view_cart();
+                break;
 
-    //         case 10:
-    //             // View cart
-    //             order.view_cart();
-    //             break;
+            // Produce bill
+            case CHECKOUT:
+                char option;
+                cout << "Are you sure you don't want to buy anything else? (y/n) ";
+                cin >> option;
 
-    //         case 20:
-    //             // Produce bill
-    //             char option;
-    //             cout << "Are you sure you don't want to buy anything else? (y/n) ";
-    //             cin >> option;
+                if (option == 'y')
+                {
+                    order.produce_bill();
+                    return 0;
+                }
+                break;
 
-    //             if (option == 'y')
-    //             {
-    //                 order.produce_bill();
-    //                 return 0;
-    //             }
-    //             break;
+            // Quit
+            case QUIT:
+                // quit();
+                return 0;
 
-    //         case 500:
-    //             // Quit
-    //             return 0;
+            default:
+                if (choice >= 1 && choice <= order.id)
+                {
+                    // Change the quantity for an item/Add an item
+                    order.change_quantity(choice);
+                }
+                else
+                {
+                    // Invalid option
+                    invalid_option();
+                }
+                break;
+        }
 
-    //         default:
-    //             // Invalid option
-    //             invalid_option();
-    //             break;
-    //     }
-
-    //     order.show_menu();
-    //     cin >> choice;
-    // }
+        order.show_menu();
+        cin >> choice;
+    }
 
     // success
     return 0;
